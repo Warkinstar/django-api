@@ -1,13 +1,14 @@
 import uuid
+
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
-    AbstractUser,
 )
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.http import Http404
+from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
@@ -19,7 +20,7 @@ class UserManager(BaseUserManager):
             return Http404
 
     def create_user(self, username, email, password=None, **kwargs):
-        """Create and return a 'User' with an email, phone number, username and password."""
+        """Create and return a `User` with an email, phone number, username and password."""
         if username is None:
             raise TypeError("Users must have a username.")
         if email is None:
@@ -32,11 +33,12 @@ class UserManager(BaseUserManager):
         )
         user.set_password(password)
         user.save(using=self._db)
+
         return user
 
     def create_superuser(self, username, email, password, **kwargs):
         """
-        Create and return a 'User' with superuser (admin), permissions
+        Create and return a `User` with superuser (admin) permissions.
         """
         if password is None:
             raise TypeError("Superusers must have a password.")
@@ -44,10 +46,12 @@ class UserManager(BaseUserManager):
             raise TypeError("Superusers must have an email.")
         if username is None:
             raise TypeError("Superusers must have an username.")
+
         user = self.create_user(username, email, password, **kwargs)
         user.is_superuser = True
         user.is_staff = True
         user.save(using=self._db)
+
         return user
 
 
@@ -58,8 +62,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(db_index=True, max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
+
     email = models.EmailField(db_index=True, unique=True)
     is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
+
+    bio = models.TextField(null=True)
+    avatar = models.ImageField(null=True)
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_('Designates whether the user can log into this admin site.'),
+    )
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
