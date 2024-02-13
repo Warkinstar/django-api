@@ -42,10 +42,12 @@ INSTALLED_APPS = [
     "core",
     "core.user",
     "core.auth",
+    "core.post",
 
     # 3-rd party
     "rest_framework",
     "rest_framework_simplejwt",
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
