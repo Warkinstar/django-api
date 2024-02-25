@@ -16,6 +16,11 @@ class CommentSerializer(AbstractSerializer):
         queryset=Post.objects.all(), slug_field="public_id"
     )
 
+    def validate_post(self, value):
+        if self.instance:
+            return self.instance.post
+        return value
+
     def validate_author(self, value):
         """
         Вызываются с целью проверки значений полей, переданных в теле запроса, до того,
@@ -24,6 +29,13 @@ class CommentSerializer(AbstractSerializer):
         if self.context["request"].user != value:
             raise ValidationError("You can't create a post for another user.")
         return value
+
+    def update(self, instance, validated_data):
+        if not instance.edited:
+            validated_data["edited"] = True
+
+        instance = super().update(instance, validated_data)
+        return instance
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
