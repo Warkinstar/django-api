@@ -5,11 +5,12 @@ from core.post.serializers import PostSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from core.auth.permissions import UserPermission
 
 
 class PostViewSet(AbstractViewSet):
     http_method_name = ("post", "get", "put", "delete")
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (UserPermission,)
     serializer_class = PostSerializer
 
     def get_queryset(self):
